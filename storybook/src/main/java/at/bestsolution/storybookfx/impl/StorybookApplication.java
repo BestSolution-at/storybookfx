@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -39,7 +40,6 @@ public class StorybookApplication extends Application {
 	private VBox storyPane = new VBox();
 	
 	{
-		storyPane.getStyleClass().add("root");
 		storyPane.setStyle("-fx-background-color: white");
 		storyPane.setPadding(new Insets(10));
 	}
@@ -72,11 +72,14 @@ public class StorybookApplication extends Application {
 	}
 	
 	public void refreshStylesheets() {
-		storyPane.getStylesheets().clear();
-		ServiceLoader.load(StorybookTheme.class).forEach( t -> {
-			storyPane.getStylesheets().addAll(t.getStylesheets().stream().map( s -> s + "?count=" + refreshCount).collect(Collectors.toList()));
+		storyPane.lookupAll(".story-root").forEach( n -> {
+			((Parent)n).getStylesheets().clear();
+			refreshCount += 1;
+			
+			ServiceLoader.load(StorybookTheme.class).forEach( t -> {
+				storyPane.getStylesheets().addAll(t.getStylesheets().stream().map( s -> s + "?count=" + refreshCount).collect(Collectors.toList()));
+			});
 		});
-		
 	}
 
 	private Node createNavigation() {
@@ -152,9 +155,19 @@ public class StorybookApplication extends Application {
 	
 	private VBox createSampleView(StorySample storySample) {
 		VBox box = new VBox(10);
-		box.getChildren().add(new Label(storySample.title()));
+		Label label = new Label(storySample.title());
+		label.setStyle("-fx-font-weight: bold; -fx-font-size: 20px");
+		box.getChildren().add(label);
 		
-		ZoomContainer pane = new ZoomContainer(new StackPane(storySample.createSampleNode()));
+		StackPane storySampleRoot = new StackPane(storySample.createSampleNode());
+		storySampleRoot.setStyle("-fx-background-color: white");
+		storySampleRoot.getStyleClass().addAll("root","story-root");
+		
+		ServiceLoader.load(StorybookTheme.class).forEach( t -> {
+			storySampleRoot.getStylesheets().addAll(t.getStylesheets().stream().map( s -> s + "?count=" + refreshCount).collect(Collectors.toList()));
+		});
+		
+		ZoomContainer pane = new ZoomContainer(storySampleRoot);
 		pane.setZoomLevel(zoomLevel.get());
 		pane.getStyleClass().add("storybook-sample-canvas");
 		box.getChildren().add(pane);
