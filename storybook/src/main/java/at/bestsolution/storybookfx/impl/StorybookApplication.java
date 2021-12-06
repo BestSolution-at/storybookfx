@@ -9,11 +9,13 @@ import at.bestsolution.storybookfx.Story;
 import at.bestsolution.storybookfx.Storybook;
 import at.bestsolution.storybookfx.StorybookTheme;
 import javafx.application.Application;
-import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToolBar;
@@ -25,11 +27,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 public class StorybookApplication extends Application {
 	private int refreshCount = 0;
 	
-	private StackPane storyPane = new StackPane();
+	private ZoomPane storyPane = new ZoomPane();
 	
 	{
 		storyPane.getStyleClass().add("root");
@@ -122,15 +125,38 @@ public class StorybookApplication extends Application {
 		VBox box = new VBox();
 		box.getStyleClass().add("storybook-content-area");
 		
-		Button b = new Button("Refresh");
-		b.setOnAction( evt -> {
+		Button refresh = new Button("Refresh");
+		refresh.setOnAction( evt -> {
 			refreshStylesheets();
 		});
-		ToolBar bar = new ToolBar(b);
+		
+		
+		ChoiceBox<Double> zoomLevel = new ChoiceBox<>(FXCollections.observableArrayList(1.0, 1.5, 2.0, 2.5)); 
+		zoomLevel.setConverter( new StringConverter<Double>() {
+			
+			@Override
+			public String toString(Double v) {
+				return v * 100 + "%";
+			}
+			
+			@Override
+			public Double fromString(String v) {
+				return null;
+			}
+		});
+		zoomLevel.setValue(1.0);
+		storyPane.zoomLevelProperty().bind(zoomLevel.valueProperty());
+		
+		ToolBar bar = new ToolBar(refresh, zoomLevel);
 		box.getChildren().add(bar);
 		
-		VBox.setVgrow(storyPane, Priority.ALWAYS);
-		box.getChildren().add(storyPane);
+		
+		ScrollPane scrollPane = new ScrollPane(storyPane);
+		scrollPane.setFitToWidth(true);
+		scrollPane.setFitToHeight(true);
+		box.getChildren().add(scrollPane);
+		
+		VBox.setVgrow(scrollPane, Priority.ALWAYS);
 		
 		StackPane stackPane = new StackPane(box);
 		stackPane.setPadding(new Insets(10));
