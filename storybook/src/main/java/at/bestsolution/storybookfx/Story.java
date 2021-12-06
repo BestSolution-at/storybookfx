@@ -1,9 +1,8 @@
 package at.bestsolution.storybookfx;
 
-import javafx.scene.Node;
+import java.util.List;
 
 public interface Story {
 	public String title();
-//	public Class<? extends Node> component();
-	public Node createSampleNode();
+	public List<StorySample> samples();
 }

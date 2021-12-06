@@ -6,15 +6,19 @@ import java.util.ServiceLoader.Provider;
 import java.util.stream.Collectors;
 
 import at.bestsolution.storybookfx.Story;
+import at.bestsolution.storybookfx.StorySample;
 import at.bestsolution.storybookfx.Storybook;
 import at.bestsolution.storybookfx.StorybookTheme;
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TitledPane;
@@ -32,13 +36,15 @@ import javafx.util.StringConverter;
 public class StorybookApplication extends Application {
 	private int refreshCount = 0;
 	
-	private ZoomPane storyPane = new ZoomPane();
+	private VBox storyPane = new VBox();
 	
 	{
 		storyPane.getStyleClass().add("root");
 		storyPane.setStyle("-fx-background-color: white");
 		storyPane.setPadding(new Insets(10));
 	}
+	
+	private DoubleProperty zoomLevel = new SimpleDoubleProperty(this, "zoomLevel", 1.0);
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -56,6 +62,13 @@ public class StorybookApplication extends Application {
 		stage.show();
 		
 		refreshStylesheets();
+		
+		zoomLevel.addListener( (obs, ol, ne) -> {
+			storyPane.lookupAll("ZoomContainer").forEach( n -> {
+				ZoomContainer c = (ZoomContainer) n;
+				c.setZoomLevel(zoomLevel.get());
+			});
+		});
 	}
 	
 	public void refreshStylesheets() {
@@ -91,22 +104,32 @@ public class StorybookApplication extends Application {
 			pane.setCollapsible(false);
 			pane.setMaxHeight(Double.MAX_VALUE);
 			VBox.setVgrow(pane, Priority.ALWAYS);
-			TreeView<Story> view = new TreeView<>();
+			TreeView<Object> view = new TreeView<>();
 			view.setCellFactory( ( v ) -> {
-				return new TreeCell<Story>() {
-					public void updateItem(Story value, boolean empty) {
+				return new TreeCell<Object>() {
+					public void updateItem(Object value, boolean empty) {
 						super.updateItem(story, empty);
 						if( value != null ) {
-							setText(story.title().split("/")[1]); 
+							if( value instanceof Story ) {
+								Story s = (Story) value;
+								setText(s.title().split("/")[1]);	
+							} else if( value instanceof StorySample ) {
+								StorySample s = (StorySample) value;
+								setText(s.title());
+							}
+						} else {
+							setText("");
 						}
 					}
 				};
 			});
-			view.setRoot(new TreeItem<Story>());
+			view.setRoot(new TreeItem<Object>());
 			view.setShowRoot(false);
 			view.getSelectionModel().selectedItemProperty().addListener( (ob,ol,ne) -> {
 				if( ne != null ) {
-					storyPane.getChildren().setAll(ne.getValue().createSampleNode());	
+					if( ne.getValue() instanceof Story ) {
+						updatePreview((Story) ne.getValue());
+					}
 				} else {
 					storyPane.getChildren().clear();
 				}
@@ -119,6 +142,24 @@ public class StorybookApplication extends Application {
 		
 		TreeView<Story> content = (TreeView<Story>) pane.getContent();
 		content.getRoot().getChildren().add(new TreeItem<Story>(story, null));
+	}
+	
+	private void updatePreview(Story story) {
+		VBox box = new VBox(20);
+		box.getChildren().addAll(story.samples().stream().map(this::createSampleView).collect(Collectors.toList()));
+		storyPane.getChildren().setAll(box);
+	}
+	
+	private VBox createSampleView(StorySample storySample) {
+		VBox box = new VBox(10);
+		box.getChildren().add(new Label(storySample.title()));
+		
+		ZoomContainer pane = new ZoomContainer(new StackPane(storySample.createSampleNode()));
+		pane.setZoomLevel(zoomLevel.get());
+		pane.getStyleClass().add("storybook-sample-canvas");
+		box.getChildren().add(pane);
+		
+		return box;
 	}
 
 	private Node createContentArea() {
@@ -145,7 +186,7 @@ public class StorybookApplication extends Application {
 			}
 		});
 		zoomLevel.setValue(1.0);
-		storyPane.zoomLevelProperty().bind(zoomLevel.valueProperty());
+		this.zoomLevel.bind(zoomLevel.valueProperty()); 
 		
 		ToolBar bar = new ToolBar(refresh, zoomLevel);
 		box.getChildren().add(bar);

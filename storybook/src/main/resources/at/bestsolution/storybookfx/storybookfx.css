@@ -13,6 +13,16 @@
    -fx-effect: dropshadow( gaussian, rgba(0,0,0,0.1), 10, 0.1, 0, 0 );    
 }
 
+.storybook-sample-canvas {
+    -fx-background-color: white;
+    -fx-border-color: #ddd; 
+    -fx-border-style: solid; 
+    -fx-border-width: 1px; 
+    -fx-padding: 20px; 
+    -fx-border-radius: 4px;
+    -fx-effect: dropshadow( gaussian, rgba(0,0,0,0.1), 10, 0.1, 0, 0 );
+}
+
 .storybook-navigation {
     -fx-padding: 10 0 10 0;
     -fx-background-color: rgb(246, 249, 252);
