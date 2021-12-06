@@ -1,0 +1,33 @@
+.storybook-splitpane {
+    -fx-background-color: transparent;
+    
+}
+
+.storybook-splitpane .split-pane-divider {
+    -fx-background-color: rgb(246, 249, 252);
+}
+
+.storybook-content-area {
+    -fx-background-color: white;
+    -fx-background-radius: 4px;
+   -fx-effect: dropshadow( gaussian, rgba(0,0,0,0.1), 10, 0.1, 0, 0 );    
+}
+
+.storybook-navigation {
+    -fx-padding: 10 0 10 0;
+    -fx-background-color: rgb(246, 249, 252);
+}
+
+.storybook-navigation .titled-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.storybook-navigation .titled-pane .content {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.storybook-navigation .titled-pane .content .tree-view .tree-cell:empty {
+    -fx-background-color: transparent;
+}
