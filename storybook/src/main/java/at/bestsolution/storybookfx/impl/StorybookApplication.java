@@ -77,7 +77,7 @@ public class StorybookApplication extends Application {
 			refreshCount += 1;
 			
 			ServiceLoader.load(StorybookTheme.class).forEach( t -> {
-				storyPane.getStylesheets().addAll(t.getStylesheets().stream().map( s -> s + "?count=" + refreshCount).collect(Collectors.toList()));
+				storyPane.getStylesheets().addAll(t.getStylesheets());
 			});
 		});
 	}
@@ -164,7 +164,7 @@ public class StorybookApplication extends Application {
 		storySampleRoot.getStyleClass().addAll("root","story-root");
 		
 		ServiceLoader.load(StorybookTheme.class).forEach( t -> {
-			storySampleRoot.getStylesheets().addAll(t.getStylesheets().stream().map( s -> s + "?count=" + refreshCount).collect(Collectors.toList()));
+			storySampleRoot.getStylesheets().addAll(t.getStylesheets());
 		});
 		
 		ZoomContainer pane = new ZoomContainer(storySampleRoot);
