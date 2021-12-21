@@ -87,7 +87,12 @@ public class StorybookApplication extends Application {
 		if( refreshCount == 0 ) {
 			return styles;
 		}
-		return styles.stream().map( s -> s + "?count="+ refreshCount).collect(Collectors.toList());
+		return styles.stream().map( s -> {
+			if( s.startsWith("file") ) {
+				return "nocache:" + s + "?count="+ refreshCount;
+			}
+			return s;
+		}).collect(Collectors.toList());
 	}
 
 	private Node createNavigation() {
