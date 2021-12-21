@@ -1,6 +1,7 @@
 package at.bestsolution.storybookfx.impl;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.ServiceLoader.Provider;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 public class StorybookApplication extends Application {
-	private int refreshCount = 0;
+	private static int refreshCount = 0;
 	
 	private VBox storyPane = new VBox();
 	
@@ -77,9 +78,16 @@ public class StorybookApplication extends Application {
 			refreshCount += 1;
 			
 			ServiceLoader.load(StorybookTheme.class).forEach( t -> {
-				storyPane.getStylesheets().addAll(t.getStylesheets());
+				storyPane.getStylesheets().addAll(uniqueStyles(t.getStylesheets()));
 			});
 		});
+	}
+	
+	private static List<String> uniqueStyles(List<String> styles) {
+		if( refreshCount == 0 ) {
+			return styles;
+		}
+		return styles.stream().map( s -> s + "?count="+ refreshCount).collect(Collectors.toList());
 	}
 
 	private Node createNavigation() {
@@ -164,7 +172,7 @@ public class StorybookApplication extends Application {
 		storySampleRoot.getStyleClass().addAll("root","story-root");
 		
 		ServiceLoader.load(StorybookTheme.class).forEach( t -> {
-			storySampleRoot.getStylesheets().addAll(t.getStylesheets());
+			storySampleRoot.getStylesheets().addAll(uniqueStyles(t.getStylesheets()));
 		});
 		
 		ZoomContainer pane = new ZoomContainer(storySampleRoot);
