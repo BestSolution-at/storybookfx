@@ -124,7 +124,7 @@ public class StorybookApplication extends Application {
 			view.setCellFactory( ( v ) -> {
 				return new TreeCell<Object>() {
 					public void updateItem(Object value, boolean empty) {
-						super.updateItem(story, empty);
+						super.updateItem(value, empty);
 						if( value != null ) {
 							if( value instanceof Story ) {
 								Story s = (Story) value;
