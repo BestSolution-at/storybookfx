@@ -50,6 +50,7 @@
 
 	<modules>
 		<module>storybook</module>
+		<module>storybook-scenicview</module>
 	</modules>
 	
 	<build>
