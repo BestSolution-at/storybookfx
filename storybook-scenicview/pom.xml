@@ -9,6 +9,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>at.bestsolution.storybookfx</groupId>
+			<artifactId>storybook</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-fxml</artifactId>
 		</dependency>
