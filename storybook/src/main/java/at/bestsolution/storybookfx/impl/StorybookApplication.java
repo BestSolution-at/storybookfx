@@ -78,7 +78,7 @@ public class StorybookApplication extends Application {
 			refreshCount += 1;
 			
 			ServiceLoader.load(StorybookTheme.class).forEach( t -> {
-				storyPane.getStylesheets().addAll(uniqueStyles(t.getStylesheets()));
+				((Parent)n).getStylesheets().addAll(uniqueStyles(t.getStylesheets()));
 			});
 		});
 	}
@@ -145,6 +145,8 @@ public class StorybookApplication extends Application {
 				if( ne != null ) {
 					if( ne.getValue() instanceof Story ) {
 						updatePreview((Story) ne.getValue());
+					} else if( ne.getValue() instanceof StorySample ) {
+						updatePreview((StorySample) ne.getValue());
 					}
 				} else {
 					storyPane.getChildren().clear();
@@ -156,13 +158,25 @@ public class StorybookApplication extends Application {
 			box.getChildren().add(pane);
 		}
 		
-		TreeView<Story> content = (TreeView<Story>) pane.getContent();
-		content.getRoot().getChildren().add(new TreeItem<Story>(story, null));
+		TreeView<Object> content = (TreeView<Object>) pane.getContent();
+		TreeItem<Object> storyItem = new TreeItem<Object>(story, null);
+		
+		storyItem.getChildren().addAll(story.samples().stream()
+			.map( ss -> new TreeItem<Object>(ss, null))
+			.collect(Collectors.toList()));
+		
+		content.getRoot().getChildren().add(storyItem);
 	}
 	
 	private void updatePreview(Story story) {
 		VBox box = new VBox(20);
 		box.getChildren().addAll(story.samples().stream().map(this::createSampleView).collect(Collectors.toList()));
+		storyPane.getChildren().setAll(box);
+	}
+	
+	private void updatePreview(StorySample story) {
+		VBox box = new VBox(20);
+		box.getChildren().addAll(createSampleView(story));
 		storyPane.getChildren().setAll(box);
 	}
 	
