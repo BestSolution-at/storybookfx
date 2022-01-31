@@ -1,4 +1,5 @@
 import at.bestsolution.storybookfx.Story;
+import at.bestsolution.storybookfx.StorybookPlugin;
 import at.bestsolution.storybookfx.StorybookTheme;
 
 module at.bestsolution.storybookfx {
@@ -11,4 +12,5 @@ module at.bestsolution.storybookfx {
 	
 	uses Story;
 	uses StorybookTheme;
+	uses StorybookPlugin;
 }

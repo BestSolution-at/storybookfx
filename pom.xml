@@ -51,6 +51,7 @@
 	<modules>
 		<module>storybook</module>
 		<module>storybook-scenicview</module>
+		<module>storybook-plugin-property</module>
 	</modules>
 	
 	<build>

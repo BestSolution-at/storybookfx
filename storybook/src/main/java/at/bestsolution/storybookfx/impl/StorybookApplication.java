@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import at.bestsolution.storybookfx.Story;
 import at.bestsolution.storybookfx.StorySample;
 import at.bestsolution.storybookfx.Storybook;
+import at.bestsolution.storybookfx.StorybookPlugin;
 import at.bestsolution.storybookfx.StorybookTheme;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
@@ -70,6 +71,8 @@ public class StorybookApplication extends Application {
 				c.setZoomLevel(zoomLevel.get());
 			});
 		});
+		
+		ServiceLoader.load(StorybookPlugin.class).forEach( plugin -> plugin.processScene(scene));
 	}
 	
 	public void refreshStylesheets() {
@@ -158,6 +161,7 @@ public class StorybookApplication extends Application {
 			box.getChildren().add(pane);
 		}
 		
+		@SuppressWarnings("unchecked")
 		TreeView<Object> content = (TreeView<Object>) pane.getContent();
 		TreeItem<Object> storyItem = new TreeItem<Object>(story, null);
 		
